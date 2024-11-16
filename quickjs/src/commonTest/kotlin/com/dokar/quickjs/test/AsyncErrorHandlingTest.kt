@@ -75,6 +75,24 @@ class AsyncErrorHandlingTest {
     }
 
     @Test
+    fun withPromiseCatch2() = runTest {
+        quickJs {
+            asyncFunction("fetch") { error("Error occurred") }
+
+            val js = """
+                async function fetch() {
+                    throw Error("bad thing happened");
+                };
+                await fetch().catch((e) => {});
+                'Caught';
+                """.trimIndent()
+
+            val result = evaluate<String>(js)
+            assertEquals("Caught", result)
+        }
+    }
+
+    @Test
     fun jobCancelingWithUncaughtNoAwait() = runTest {
         quickJs {
             var isDelayed = false
